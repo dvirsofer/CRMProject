@@ -21,7 +21,12 @@
                     <p>Dashboard</p>
                 </a>
             </li>
-
+            <li class="active">
+                <a href="add_new_customer.php">
+                    <i class="pe-7s-add-user"></i>
+                    <p>Add Customer</p>
+                </a>
+            </li>
         </ul>
     </div>
 </div>
