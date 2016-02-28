@@ -2,17 +2,35 @@
 
 @session_start();
 
-include_once 'database/Database.php';
+?>
+
+<?php include_once('parts/head.php'); ?>
+
+<body>
+
+<div class="wrapper">
+
+    <?php include_once('parts/sidebar.php'); ?>
+
+    <div class="main-panel">
+
+        <?php include_once('parts/nav.php'); ?>
+
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                <!-- Main content start here -->
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
 
 
-$db = new Database();
+</body>
 
-$customers = getCustomers($db);
 
-var_export($customers);
+<?php include_once('parts/bottom.php'); ?>
 
-function getCustomers($db) {
-    $q = "select * from customers";
-    $result = $db->createQuery($q);
-    return $result;
-}

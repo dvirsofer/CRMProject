@@ -1,5 +1,7 @@
 <?php
+
 include_once 'help_functions.php';
+
 class Database {
 	private $_username = 'hr';
 	private $_password = 'hr';
@@ -24,11 +26,12 @@ class Database {
 		oci_close($this->_dbh);
 		// close connection
 	}
-	
+
 	/**
 	 * execute the query and return result
 	 * @param String $q - the Query
-	 */ 
+	 * @return array
+	 */
 	public function createQuery($q) {
 		$stid = oci_parse($this->_dbh, $q);
 		oci_execute($stid);
