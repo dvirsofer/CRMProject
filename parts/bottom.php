@@ -11,9 +11,10 @@
 <!--  Notifications Plugin    -->
 <script src="assets/js/bootstrap-notify.js"></script>
 
-<script src="assets/js/jquery-ui.js"></script>
+<script src="assets/js/jquery-ui.min.js"></script>
+<script src="assets/js/jquery.validate.min.js"></script>
 
-<script src="assets/js/jquery/bootstrap.wizard.js"></script>
+<script src="assets/js/jquery.bootstrap.wizard.min.js"></script>
 
 
 
