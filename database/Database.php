@@ -5,12 +5,13 @@ include_once 'help_functions.php';
 class Database {
 	private $_username = 'hr';
 	private $_password = 'hr';
-	private $_oracle_sid = 'localhost:1521/xe';
 	protected $_query;
 	protected $_dbh;
 
 	// contructor for creating a connection to the database
 	public function __construct() {
+		$db_props = parse_ini_file('db.ini');
+		$this->_oracle_sid = $db_props['oraclesid'];
 		$this->_dbh = oci_connect ( $this->_username, $this->_password, $this->_oracle_sid);
 		if ($this->_dbh) {
 		}
