@@ -22,9 +22,15 @@
                 </a>
             </li>
             <li class="active">
-                <a href="add_new_customer.php">
+                <a href="customers_list.php">
                     <i class="pe-7s-add-user"></i>
                     <p>Customers</p>
+                </a>
+            </li>
+            <li class="active">
+                <a href="products_list.php">
+                    <i class="pe-7s-cart"></i>
+                    <p>Products</p>
                 </a>
             </li>
         </ul>
