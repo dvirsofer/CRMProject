@@ -17,4 +17,9 @@
 <!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
 <script src="assets/js/light-bootstrap-dashboard.js"></script>
 
+<script src="assets/js/stats.js"></script>
+<script src="assets/js/sweetalert2.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/base.js"></script>
+
 </html>
