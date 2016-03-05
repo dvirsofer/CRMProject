@@ -2,8 +2,8 @@
 
 @session_start();
 
+@require_once('help_functions.php');
 @require_once('database/Customer.php');
-
 
 $err = '';
 $success = '';
@@ -34,12 +34,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <div class="main-panel">
 
-        <?php include_once('parts/nav.php'); ?>
+        <?php include_once('parts/nav_customer.php'); ?>
 
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
                 <!-- Main content start here -->
+                    <h3>Add a new customer</h3>
 
                     <?php if(!empty($err)) { ?>
                         <div class="alert alert-danger" role="alert">

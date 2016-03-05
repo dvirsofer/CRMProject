@@ -11,7 +11,8 @@ class Customer {
 	 * @param $last_name
 	 * @return string errors if found any
 	 */
-	public static function testNewCustomer($first_name, $last_name) {
+	public static function testNewCustomer($first_name, $last_name)
+	{
 		$err = '';
 		if ((empty($first_name)) || (empty($last_name))) {
 			$err = "Please fill in all the form";
@@ -32,7 +33,8 @@ class Customer {
 	/**
 	 * Insert new customer details
 	 */
-	public static function insertCustomer($first_name, $last_name) {
+	public static function insertCustomer($first_name, $last_name)
+	{
 		$db = new Database();
 		$q = "begin insert_customer(:cfirst_name, :clast_name); end;";
 		$stid = $db->parseQuery($q);
@@ -40,6 +42,14 @@ class Customer {
 		oci_bind_by_name($stid, ':clast_name', $last_name);
 		$r = oci_execute($stid);  // executes and commits
 		return $r;
+	}
+
+	public static function getCustomersList()
+	{
+		$db = new Database();
+		$q = "select * from table(get_customers(1,99999))";
+		$result = $db->fetchAll($q);
+		return $result;
 	}
 
 

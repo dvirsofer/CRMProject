@@ -42,6 +42,25 @@ class Database {
 		}
 		return $result;
 	}
+
+	public function fetchAll($q)
+	{
+		$stid = oci_parse($this->_dbh, $q);
+		oci_execute($stid);
+		// get results
+		oci_fetch_all($stid, $result);
+
+		$keys = array_keys($result);
+		$objectsArray = array();
+
+		for ($i=0; $i < count($result[$keys[0]]); $i++) {
+			foreach($keys as $key) {
+				$objectsArray[$i]->$key = $result[$key][$i];
+			}
+		}
+
+		return $objectsArray;
+	}
 	
 	public function parseQuery($q) {
 		$stid = oci_parse($this->_dbh, $q);

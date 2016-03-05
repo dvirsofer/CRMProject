@@ -24,7 +24,7 @@
             <li class="active">
                 <a href="add_new_customer.php">
                     <i class="pe-7s-add-user"></i>
-                    <p>Add Customer</p>
+                    <p>Customers</p>
                 </a>
             </li>
         </ul>
