@@ -33,6 +33,12 @@
                     <p>Products</p>
                 </a>
             </li>
+            <li class="active">
+                <a href="warehouse_list.php">
+                    <i class="pe-7s-add-user"></i>
+                    <p>Warehouse</p>
+                </a>
+            </li>
         </ul>
     </div>
 </div>
