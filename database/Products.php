@@ -42,13 +42,11 @@ class Products {
      */
     public static function getProductById($p_id) {
     	$db = new Database();
-    	$q = "SELECT * FROM products WHERE p_id='{$p_id}'";
-    	$result = $db->createQuery($q);
-    	if (count($result) > 0) {
-    		return $result;
-    	} else {
-    		return FALSE;
-    	}
+    	$q = "select * from table(get_product_by_id(:pid))";
+		$stid = $db->parseQuery($q);
+		oci_bind_by_name($stid, ':pid', $p_id);
+		$result = $db->fetchAll($q, $stid);
+		return $result[0];
     }
     
     /**

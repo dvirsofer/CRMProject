@@ -44,9 +44,12 @@ class Database {
 		return $result;
 	}
 
-	public function fetchAll($q)
+	public function fetchAll($q, $stid = null)
 	{
-		$stid = oci_parse($this->_dbh, $q);
+		if (is_null($stid)) {
+			$stid = oci_parse($this->_dbh, $q);
+		}
+
 		oci_execute($stid);
 		// get results
 		oci_fetch_all($stid, $result);
