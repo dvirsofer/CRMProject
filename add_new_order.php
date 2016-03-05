@@ -44,7 +44,8 @@ $customers = Customer::getCustomersList();
                                             <div class="col-md-10 col-md-offset-1">
                                                 <div class="form-group">
                                                     <label class="control-label">Customer</label>
-                                                    <select class="form-control" name="customer" id="customer" name="customer">
+                                                    <select class="form-control required" name="customer" id="customer">
+                                                        <option value="">Choose an option</option>
                                                         <?php foreach ($customers as $customer): ?>
                                                             <option value="<?php echo($customer->CUST_ID); ?>"><?php echo($customer->FIRST_NAME); ?></option>
                                                         <?php endforeach; ?>
@@ -210,6 +211,7 @@ $customers = Customer::getCustomersList();
     </div>
 </div>
 
+<div><div class="sweet-overlay" tabindex="-1"></div><div class="sweet-alert" tabindex="-1"><div class="icon error"><span class="x-mark"><span class="line left"></span><span class="line right"></span></span></div><div class="icon warning"> <span class="body"></span> <span class="dot"></span> </div> <div class="icon info"></div> <div class="icon success"> <span class="line tip"></span> <span class="line long"></span> <div class="placeholder"></div> <div class="fix"></div> </div> <div class="icon custom"></div> <h2>Title</h2><p>Text</p><hr><button class="confirm">OK</button><button class="cancel">Cancel</button></div></div>
 
 </body>
 
@@ -225,40 +227,13 @@ $customers = Customer::getCustomersList();
 
         var $validator = $("#wizardForm").validate({
             rules: {
-                email: {
-                    required: true,
-                    email: true,
-                    minlength: 5
-                },
-                first_name: {
-                    required: false,
-                    minlength: 5
-                },
-                last_name: {
-                    required: false,
-                    minlength: 5
-                },
-                website: {
-                    required: true,
-                    minlength: 5,
-                    url: true
-                },
-                framework: {
-                    required: false,
-                    minlength: 4
-                },
-                cities: {
+                customer: {
                     required: true
-                },
-                price:{
-                    number: true
                 }
             }
         });
 
 
-
-        // you can also use the nav-pills-[blue | azure | green | orange | red] for a different color of wizard
 
         $('#wizardCard').bootstrapWizard({
             tabClass: 'nav nav-pills',
@@ -322,6 +297,5 @@ $customers = Customer::getCustomersList();
 
 
 <script src="assets/js/orders_wizard.js"></script>
-
 
 </html>
