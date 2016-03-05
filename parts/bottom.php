@@ -11,6 +11,12 @@
 <!--  Notifications Plugin    -->
 <script src="assets/js/bootstrap-notify.js"></script>
 
+<script src="assets/js/jquery-ui.js"></script>
+
+<script src="assets/js/jquery/bootstrap.wizard.js"></script>
+
+
+
 <!--  Google Maps Plugin    -->
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
 
@@ -19,7 +25,14 @@
 
 <script src="assets/js/stats.js"></script>
 <script src="assets/js/sweetalert2.js"></script>
-<script src="assets/js/utils.js"></script>
+<script src="assets/js/util.js"></script>
 <script src="assets/js/base.js"></script>
+<script src="assets/js/common.js"></script>
 
-</html>
+
+<!--fooTable-->
+<script src="assets/js/footable.js"></script>
+<script src="assets/js/footable.filter.js"></script>
+<script src="assets/js/footable.paginate.js"></script>
+<script src="assets/js/footable.sort.js"></script>
+

@@ -34,3 +34,5 @@
 
 <?php include_once('parts/bottom.php'); ?>
 
+
+</html>
