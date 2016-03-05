@@ -27,4 +27,6 @@
 
     <!-- Font Awesome core CSS     -->
     <link href="assets/css/font-awesome.min.css" rel="stylesheet" />
+
+    <link href="assets/css/base.css" rel="stylesheet" />
 </head>
