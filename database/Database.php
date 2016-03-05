@@ -56,7 +56,7 @@ class Database {
 
 		for ($i=0; $i < count($result[$keys[0]]); $i++) {
 			foreach($keys as $key) {
-				$objectsArray[$i]->$key = $result[$key][$i];
+				@$objectsArray[$i]->$key = $result[$key][$i];
 			}
 		}
 
