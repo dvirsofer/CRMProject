@@ -63,16 +63,12 @@ class Order {
     /**
      * Create new order header
      */
-    public static function insertHeader($db) {
-    	$q = "begin insert_order_header(to_date(:corder_date, 'dd/mm/yyyy'), :ccust_id, :cstatus); end;";
+    public static function insertHeader($db, $customer_id, $status = 'Open') {
+    	$q = "begin insert_order_header(:ccust_id, :cstatus); end;";
         $stid = $db->parseQuery($q);
-        // Get the right date format to insert
-        $formatDate = date("d/m/Y", strtotime($_POST['order-date']));
-        oci_bind_by_name($stid, ':corder_date', $formatDate);
         // Get the cust id only
-        $cust_id = substr($_POST['customer'], 0, strpos($_POST['customer'], ' '));
-        oci_bind_by_name($stid, ':ccust_id', $cust_id);
-        oci_bind_by_name($stid, ':cstatus', $_POST['status']);
+        oci_bind_by_name($stid, ':ccust_id', $customer_id);
+        oci_bind_by_name($stid, ':cstatus', $status);
         $r = oci_execute($stid);  // executes and commits
         return $r;
     }
