@@ -17,10 +17,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $formType = $_POST['formType'];
     if($formType == 1) {
         $product_id = $_POST['product_id'];
+        $productInfo = Products::getProductById($product_id);
     }
     else {
-        $product_id = $_POST['product_id'];
-        $productInfo = Products::getProductById($product_id);
+        // update product in database
+        $productId = $_POST['pid'];
+        $warehouseId = $_POST['warehouse_id'];
+        $productName = $_POST['product_name'];
+        $quantity = $_POST['quantity'];
+        $update = Products::updateProduct($productId, $productName, $warehouseId, $quantity);
+        if($update) {
+            $success = 'Product is update';
+        }
+        else {
+            $err = 'Product no update';
+        }
+
     }
 
 
@@ -74,9 +86,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
 
-                    <?php if ($_SERVER["REQUEST_METHOD"] == "POST") { ?>
+                    <?php if (($_SERVER["REQUEST_METHOD"] == "POST") && ($formType==1)){ ?>
 
                     <form method="post" action="edit_product.php">
+                        <input type="hidden" class="form-control" name="pid" value="<?php echo($productInfo->P_ID) ?>">
                         <input type="hidden" class="form-control" name="formType" value="2">
                         <div class="form-group">
                             <label for="warehouse_id">Select New Warehouse:</label>
@@ -86,9 +99,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <?php endforeach; ?>
                             </select>
                             <label for="product_name">Name:</label>
-                            <input type="text" class="form-control" id="product_name" name="product_name" value="">
+                            <input type="text" class="form-control" id="product_name" name="product_name" value="<?php echo($productInfo->DESCRIPTION) ?>">
                             <label for="quantity">Quantity</label>
-                            <input type="number" min="0" class="form-control" id="quantity" name="quantity" value=<?php $productInfo->QUANTITY ?>>
+                            <input type="number" min="0" class="form-control" id="quantity" name="quantity" value="<?php echo($productInfo->QUANTITY) ?>">
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
@@ -105,6 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 </body>
+<script src="assets/js/product.js"></script>
 
 
 <?php include_once('parts/bottom.php'); ?>
