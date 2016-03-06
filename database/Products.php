@@ -76,6 +76,20 @@ class Products {
     	
     	return $r;
     }
+
+	public static function updateProduct($product_id, $desc, $warehouse_id, $quantity) {
+		$db = new Database();
+
+		$q = "begin update_product(:pid, :cdesc, :cwarehouse_id, :quantity); end;";
+		$stid = $db->parseQuery($q);
+		oci_bind_by_name($stid, ':pid', $product_id);
+		oci_bind_by_name($stid, ':cdesc', $desc);
+		oci_bind_by_name($stid, ':cwarehouse_id', $warehouse_id);
+		oci_bind_by_name($stid, ':quantity', $quantity);
+		$r = oci_execute($stid);  // executes and commits
+
+		return $r;
+	}
     
 //    /**
 //     * Find the product id by it's description
