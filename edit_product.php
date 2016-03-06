@@ -78,6 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="form-group">
                             <label for="product_id">Select Product:</label>
                             <select class="form-control" id="product_id" name="product_id">
+                                <option value="0">Select Product</option>
                                 <?php foreach ($products as $product): ?>
                                     <option value="<?php echo($product->P_ID); ?>"><?php echo($product->DESCRIPTION); ?></option>
                                 <?php endforeach; ?>
@@ -90,14 +91,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <form method="post" action="edit_product.php">
                         <input type="hidden" class="form-control" name="pid" value="<?php echo($productInfo->P_ID) ?>">
+                        <input type="hidden" class="form-control" name="warehouse_id" value="<?php echo($productInfo->WAREHOUSE_ID) ?>">
                         <input type="hidden" class="form-control" name="formType" value="2">
                         <div class="form-group">
-                            <label for="warehouse_id">Select New Warehouse:</label>
-                            <select class="form-control" id="warehouse_id" name="warehouse_id">
-                                <?php foreach ($warehouses as $warehouse): ?>
-                                    <option value="<?php echo($warehouse->WAREHOUSE_ID); ?>"><?php echo($warehouse->WAREHOUSE_NAME); ?></option>
-                                <?php endforeach; ?>
-                            </select>
                             <label for="product_name">Name:</label>
                             <input type="text" class="form-control" id="product_name" name="product_name" value="<?php echo($productInfo->DESCRIPTION) ?>">
                             <label for="quantity">Quantity</label>
@@ -118,7 +114,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 </body>
-<script src="assets/js/product.js"></script>
 
 
 <?php include_once('parts/bottom.php'); ?>
