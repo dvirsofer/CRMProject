@@ -11,10 +11,10 @@ function productDropdownEvent(event) {
 
     $.ajax({
         type: "POST",
-        url: 'edit_product.php',
+        url: 'productInfo.php',
         data: data,
         success: function(result) {
-            // console.log(result);
+            console.log(result);
 
         }
     });
