@@ -114,7 +114,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 </body>
-<script src="assets/js/product.js"></script>
 
 
 <?php include_once('parts/bottom.php'); ?>
