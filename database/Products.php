@@ -59,6 +59,21 @@ class Products {
 		$result = $db->fetchAll($q);
 		return $result;
     }
+
+	public static function getAllSortProducts($sortInfo, $sort_type) {
+		$db = new Database();
+		$q = "";
+		if($sort_type == 1) {
+			$q = "select * from table(get_products_asc(1,99999, :sort_info))";
+		}
+		elseif($sort_type == 2) {
+			$q = "select * from table(get_products_desc(1,99999, :sort_info))";
+		}
+		$stid = $db->parseQuery($q);
+		oci_bind_by_name($stid, ':sort_info', $sortInfo);
+		$result = $db->fetchAll($q, $stid);
+		return $result;
+	}
     
     /**
      * insert new product

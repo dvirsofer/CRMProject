@@ -49,6 +49,22 @@ class Warehouse {
 		return $result;
 	}
 
+	public static function getWarehouseInventory($warehouse_id, $sortInfo, $sort_type) {
+		$db = new Database();
+		$q = "";
+		if($sort_type == 1) {
+			$q = "select * from table(get_warehouse_inventory_asc(1,99999, :sort_info, :warehouse_id))";
+		}
+		elseif($sort_type == 2) {
+			$q = "select * from table(get_warehouse_inventory_desc(1,99999, :sort_info, :warehouse_id))";
+		}
+		$stid = $db->parseQuery($q);
+		oci_bind_by_name($stid, ':sort_info', $sortInfo);
+		oci_bind_by_name($stid, ':warehouse_id', $warehouse_id);
+		$result = $db->fetchAll($q, $stid);
+		return $result;
+	}
+
 
 
     
