@@ -35,8 +35,14 @@
             </li>
             <li class="active">
                 <a href="warehouse_list.php">
-                    <i class="pe-7s-add-user"></i>
-                    <p>Warehouse</p>
+                    <i class="pe-7s-home"></i>
+                    <p>Warehouses</p>
+                </a>
+            </li>
+            <li class="active">
+                <a href="orders_list.php">
+                    <i class="pe-7s-note"></i>
+                    <p>Orders</p>
                 </a>
             </li>
         </ul>

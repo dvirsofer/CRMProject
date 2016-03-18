@@ -7,6 +7,7 @@
 
 $customers = Customer::getCustomersList();
 $products = Products::getAllProducts();
+$order = Order::getOrderRows()
 
 ?>
 
@@ -145,12 +146,7 @@ $products = Products::getAllProducts();
     </div>
 </div>
 
-<div>
-    <div class="sweet-overlay" tabindex="-1"></div>
-    <div class="sweet-alert" tabindex="-1">
-        <div class="icon error"><span class="x-mark"><span class="line left"></span><span class="line right"></span></span></div><div class="icon warning"> <span class="body"></span> <span class="dot"></span> </div> <div class="icon info"></div> <div class="icon success"> <span class="line tip"></span> <span class="line long"></span> <div class="placeholder"></div> <div class="fix"></div> </div> <div class="icon custom"></div> <h2>Title</h2><p>Text</p><hr><button class="confirm">OK</button><button class="cancel">Cancel</button>
-    </div>
-</div>
+<div><div class="sweet-overlay" tabindex="-1"></div><div class="sweet-alert" tabindex="-1"><div class="icon error"><span class="x-mark"><span class="line left"></span><span class="line right"></span></span></div><div class="icon warning"> <span class="body"></span> <span class="dot"></span> </div> <div class="icon info"></div> <div class="icon success"> <span class="line tip"></span> <span class="line long"></span> <div class="placeholder"></div> <div class="fix"></div> </div> <div class="icon custom"></div> <h2>Title</h2><p>Text</p><hr><button class="confirm">OK</button><button class="cancel">Cancel</button></div></div>
 
 </body>
 

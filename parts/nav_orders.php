@@ -7,11 +7,8 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-        </div>
-        <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav navbar-left">
-            </ul>
-
+            <a class="navbar-brand" href="orders_list.php"><i class="fa fa-list"></i> Orders List</a>
+            <a class="navbar-brand" href="add_new_order.php"><i class="fa fa-plus"></i> Add New Order</a>
         </div>
     </div>
 </nav>

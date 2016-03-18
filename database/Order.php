@@ -8,57 +8,35 @@ include_once 'database/Balance.php';
 
 class Order {
 
-    /**
-     * function to check if form was submitted ok
-     * return errors if found any
-     */
-    public static function testOrderForm() {
-        $err = '';
-        if ((empty($_POST['order-date'])) || (empty($_POST['customer'])) || ($_POST['order-date'] == null)) {
-            $err = "Please fill in all the fields";
-        } else {
-        	$i = 1;
-        	while(isset($_POST['desc'.$i])) {
-        		if(empty($_POST['quantity'.$i])) {
-        			$err = "Please fill in all the fields";
-        			return $err;
-        		}
-        		$i++;
-        	}
-        	//all variables has been set
-        }
-        return $err;
-    } 
-    
-    /**
-     * Insert new order 
-     */
-    public static function insertNewOrder() {
-    	$db = new Database();
-
-    	$headerResult = Order::insertHeader($db);
-    	if($headerResult) { // Added new header
-    		$order_id = Order::getLastAdded($db)[0]['LAST'];
-    		$i = 1;
-    		while(isset($_POST['desc'.$i])) { // Insert new rows to the new header
-    			$price = explode(",",$_POST['desc'.$i])[1];
-    			$_POST['desc'.$i] = explode(",",$_POST['desc'.$i])[0];
-    			$p_id = Products::getProductId($_POST['desc'.$i]);
-     			$rowResult = Order::insertRow($i, $order_id, $p_id, $_POST['quantity'.$i], $db);
-     			if(strcmp($_POST['status'], 'Close') == 0) { // Add to Balance if Closed order
-     				$order_date = Order::getOrderDate($order_id, $db)[0]['ORDER_DATE'];
-     				Balance::insertBalanceWithAllParameters($order_date, $p_id, $_SESSION['id'], $_POST['quantity'.$i], $price,'Credit', $db);
-     				Products::reduceQuantity($p_id, $_POST['quantity'.$i], $db);
-     			}
-    			$i++;
-    		}
-    		if(strcmp($_POST['status'], 'Close') == 0) { // Create Invoice if Close
-    			Invoice::insertInvoice($order_id, $db);
-    		}
-    	} else { // Error in adding new header
-    		return FALSE;
-    	}
-    }
+//    /**
+//     * Insert new order
+//     */
+//    public static function insertNewOrder() {
+//    	$db = new Database();
+//
+//    	$headerResult = Order::insertHeader($db);
+//    	if($headerResult) { // Added new header
+//    		$order_id = Order::getLastAdded($db)[0]['LAST'];
+//    		$i = 1;
+//    		while(isset($_POST['desc'.$i])) { // Insert new rows to the new header
+//    			$price = explode(",",$_POST['desc'.$i])[1];
+//    			$_POST['desc'.$i] = explode(",",$_POST['desc'.$i])[0];
+//    			$p_id = Products::getProductId($_POST['desc'.$i]);
+//     			$rowResult = Order::insertRow($i, $order_id, $p_id, $_POST['quantity'.$i], $db);
+//     			if(strcmp($_POST['status'], 'Close') == 0) { // Add to Balance if Closed order
+//     				$order_date = Order::getOrderDate($order_id, $db)[0]['ORDER_DATE'];
+//     				Balance::insertBalanceWithAllParameters($order_date, $p_id, $_SESSION['id'], $_POST['quantity'.$i], $price,'Credit', $db);
+//     				Products::reduceQuantity($p_id, $_POST['quantity'.$i], $db);
+//     			}
+//    			$i++;
+//    		}
+//    		if(strcmp($_POST['status'], 'Close') == 0) { // Create Invoice if Close
+//    			Invoice::insertInvoice($order_id, $db);
+//    		}
+//    	} else { // Error in adding new header
+//    		return FALSE;
+//    	}
+//    }
     
     /**
      * Create new order header
@@ -104,7 +82,6 @@ class Order {
      */
     public static function getLastAdded($db) {
     	$q = "select get_last_order as last from dual";
-    	//$q = "select max(order_id) as last from orders_header";
     	$result = $db->createQuery($q);
     	return $result;
     }
@@ -159,26 +136,7 @@ class Order {
     		$i++;
     	}	
     }
-    
-    /**
-     * Delete an order by its id
-     * @param int $order_id
-     */
-    public static function deleteOrder($order_id) {
-    	$db = new Database();
-    	// Delete all rows
-    	$q = "delete from orders_rows where (order_id = :corder_id)";
-    	$stid = $db->parseQuery($q);
-    	oci_bind_by_name($stid, ':corder_id', $order_id);
-    	oci_execute($stid); // delete rows
-    	
-    	// Delete the header
-    	$q = "delete from orders_header where (order_id = :corder_id)";
-    	$stid = $db->parseQuery($q);
-    	oci_bind_by_name($stid, ':corder_id', $order_id);
-    	oci_execute($stid); // delete header
-    }
-    
+
     /**
      * Find the order header details by its id
      * @param int $order_id
@@ -200,7 +158,7 @@ class Order {
      * @return array of order rows if found or FALSE otherwise
      */
     public static function getOrderRows($order_id, $db) {
-    	$q = "select p.p_id, p.description, p.price, r.quantity, (P.PRICE*R.QUANTITY) as Total from orders_rows r, products p where r.p_id = p.p_id and r.order_id = '{$order_id}'";
+    	$q = "select p.p_id, p.description, p.price, r.quantity from orders_rows r, products p where r.p_id = p.p_id and r.order_id = '{$order_id}'";
     	$result = $db->createQuery($q);
     	if (count($result) > 0) {
     		return $result;
@@ -208,101 +166,89 @@ class Order {
     		return FALSE;
     	}
     }
-    
-    /**
-     * Get the order details
-     * @param int $order_id
-     * @param int $cust_id
-     * @param Date $start_date
-     * @param Date $end_date
-     * @param String $first_name
-     * @param String $last_name
-     * @return array of orders
-     */
-    public static function getOrdersDetails($order_id, $cust_id, $start_date, $end_date, $first_name, $last_name) {
-    	$db = new Database();
-    	
-    	$customers = Customer::getCustomersDetails($cust_id, $first_name, $last_name, $db);
 
-    	if(!$customers) {
-    		$cust_ids = "NULL";
-    	} else {
-    		$cust_ids = "";
-    		foreach ($customers as $index=>$customer) {
-    			$cust_ids .= ($customer['CUST_ID'].',');
-    		}
-    		$cust_ids[strlen($cust_ids)-1] = "";
-    	}
-    	
-    	// Get the right date format to insert
-    	if(!empty($start_date)) {
-    		$start = date("d/m/Y", strtotime($start_date));
-    	} else {
-    		$start = NULL;
-    	}
-    	if(!empty($end_date)) {
-    		$end = date("d/m/Y", strtotime($end_date));
-    	} else {
-    		$end = NULL;
-    	}
-    	 
-    	$q = "select i.order_id, to_char(i.order_date, 'DD/MM/YYYY') as order_date, i.cust_id, i.status, c.first_name, c.last_name from orders_header i, customers c where i.cust_id=c.cust_id and i.order_id='{$order_id}'
-	    	UNION
-	    	select i.order_id, to_char(i.order_date, 'DD/MM/YYYY') as order_date, i.cust_id, i.status, c.first_name, c.last_name from orders_header i, customers c where i.cust_id=c.cust_id and (i.order_date >= to_date('{$start}', 'dd/mm/yyyy') or i.order_date <= to_date('{$end}', 'dd/mm/yyyy'))
-	    	UNION
-	    	select i.order_id, to_char(i.order_date, 'DD/MM/YYYY') as order_date, i.cust_id, i.status, c.first_name, c.last_name from orders_header i, customers c where  i.cust_id=c.cust_id and i.cust_id IN ({$cust_ids})";
-    	$results = $db->createQuery($q);
-    	return $results;
-    }
-    
-    /**
-     * Find total price of an order by its id
-     * @param int $order_id
-     * @return the total price of the order
-     */
-    public static function getTotal($order_id, $db) {
-    	$q = "select sum(TOTAL) as total from (Select p.description, p.price, r.quantity, (P.PRICE*R.QUANTITY) as Total from orders_rows r, products p where r.p_id = p.p_id and r.order_id = '{$order_id}')";
-    	$total = $db->createQuery($q);
-    	if(count($total) == 0) {
-    		$total[0]['TOTAL'] = 0;
-    	}
-    	return $total;
-    }
-    
-    /**
-     * Find order date by id
-     * @param int $order_id
-     * @return String of the order's date
-     */
-    public static function getOrderDate($order_id, $db) {
-    	$q = "select TO_CHAR(ORDER_DATE, 'DD/MM/YYYY') AS ORDER_DATE from ORDERS_HEADER where order_id = '{$order_id}'";
-    	$result = $db->createQuery($q);
-    	return $result;
-    }
-    
-    /**
-     * Find all orders headers
-     * @return array of headers
-     */
-    public static function getOrdersHeader($db) {
-    	$q = "select * from orders_header order by order_id DESC";
-    	$result = $db->createQuery($q);
-    	return $result;
-    }
-    
-    /**
-     * Find all Open orders headers
-     * @return array of headers
-     */
-    public static function getOpenOrdersHeader($db) {
-    	$q = "select * from orders_header where status='Open' order by order_id";
-    	$result = $db->createQuery($q);
-    	return $result;
-    }
-    
-    public static function getOrdersCount($db) {
-    	$q = "select count(*) as count from orders_header where status LIKE 'Open'";
-    	$result = $db->createQuery($q);
-    	return $result[0]['COUNT'];
-    }
+
+	public static function getOrderHeaders($db) {
+		$q = "SELECT * FROM table(GET_ORDERS_HEADERS(1, 99999))";
+		$result = $db->createQuery($q);
+		if (count($result) > 0) {
+			return $result;
+		} else {
+			return null;
+		}
+	}
+
+//    /**
+//     * Delete an order by its id
+//     * @param int $order_id
+//     */
+//    public static function deleteOrder($order_id) {
+//    	$db = new Database();
+//    	// Delete all rows
+//    	$q = "delete from orders_rows where (order_id = :corder_id)";
+//    	$stid = $db->parseQuery($q);
+//    	oci_bind_by_name($stid, ':corder_id', $order_id);
+//    	oci_execute($stid); // delete rows
+//
+//    	// Delete the header
+//    	$q = "delete from orders_header where (order_id = :corder_id)";
+//    	$stid = $db->parseQuery($q);
+//    	oci_bind_by_name($stid, ':corder_id', $order_id);
+//    	oci_execute($stid); // delete header
+//    }
+
+
+//    /**
+//     * Get the order details
+//     * @param int $order_id
+//     * @param int $cust_id
+//     * @param Date $start_date
+//     * @param Date $end_date
+//     * @param String $first_name
+//     * @param String $last_name
+//     * @return array of orders
+//     */
+//    public static function getOrdersDetails($order_id, $cust_id, $start_date, $end_date, $first_name, $last_name) {
+//    	$db = new Database();
+//
+//    	$customers = Customer::getCustomersDetails($cust_id, $first_name, $last_name, $db);
+//
+//    	if(!$customers) {
+//    		$cust_ids = "NULL";
+//    	} else {
+//    		$cust_ids = "";
+//    		foreach ($customers as $index=>$customer) {
+//    			$cust_ids .= ($customer['CUST_ID'].',');
+//    		}
+//    		$cust_ids[strlen($cust_ids)-1] = "";
+//    	}
+//
+//    	// Get the right date format to insert
+//    	if(!empty($start_date)) {
+//    		$start = date("d/m/Y", strtotime($start_date));
+//    	} else {
+//    		$start = NULL;
+//    	}
+//    	if(!empty($end_date)) {
+//    		$end = date("d/m/Y", strtotime($end_date));
+//    	} else {
+//    		$end = NULL;
+//    	}
+//
+//    	$q = "select i.order_id, to_char(i.order_date, 'DD/MM/YYYY') as order_date, i.cust_id, i.status, c.first_name, c.last_name from orders_header i, customers c where i.cust_id=c.cust_id and i.order_id='{$order_id}'
+//	    	UNION
+//	    	select i.order_id, to_char(i.order_date, 'DD/MM/YYYY') as order_date, i.cust_id, i.status, c.first_name, c.last_name from orders_header i, customers c where i.cust_id=c.cust_id and (i.order_date >= to_date('{$start}', 'dd/mm/yyyy') or i.order_date <= to_date('{$end}', 'dd/mm/yyyy'))
+//	    	UNION
+//	    	select i.order_id, to_char(i.order_date, 'DD/MM/YYYY') as order_date, i.cust_id, i.status, c.first_name, c.last_name from orders_header i, customers c where  i.cust_id=c.cust_id and i.cust_id IN ({$cust_ids})";
+//    	$results = $db->createQuery($q);
+//    	return $results;
+//    }
+
+//    public static function getOrdersCount($db) {
+//    	$q = "select count(*) as count from orders_header where status LIKE 'Open'";
+//    	$result = $db->createQuery($q);
+//    	return $result[0]['COUNT'];
+//    }
+
+
 }

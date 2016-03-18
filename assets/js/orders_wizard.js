@@ -60,26 +60,32 @@ function removeRowEvent(e) {
     var footable = $('.footable').data('footable');
 
     //get the row we are wanting to delete
-    var row = $(this).parents('tr:first');
+    var $row = $(this).parents('tr:first');
+    var product_id = $row.find('td:first').text();
+    delete addedProducts[product_id];
 
     //delete the row
-    footable.removeRow(row);
+    footable.removeRow($row);
 }
 
-function onFinishWizard(){
-    //here you can do something, sent the form to server via ajax and show a success message with swal
+function onFinishWizard() {
 
-    swal("Good job!", "You clicked the finish button!", "success");
+    $.post("requests.php",
+        {
+            "action": "save_order",
+            "customer": selectedCustomer,
+            "products": addedProducts
+        },
+        function(data, status){
+            if (data["status"]) {
+                var order_id = data["order_id"];
+                swal("Good job!", "New order number " + order_id + " has been created!", "success");
+            }
+        });
 }
 
-function onLaterWizard(){
-    //here you can do something, sent the form to server via ajax and show a success message with swal
-
-    swal("Good job!", "You clicked the finish button!", "success");
-}
-
-function createOrder() {
-
+function onCancelWizard() {
+    location.href =" index.php";
 }
 
 function initWizard() {
@@ -118,7 +124,7 @@ function initWizard() {
 
             $display_width = $(document).width();
 
-            if($display_width < 600 && $total > 3){
+            if ($display_width < 600 && $total > 3){
                 $width = 50;
             }
             navigation.find('li').css('width',$width + '%');
