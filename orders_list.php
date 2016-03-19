@@ -63,7 +63,13 @@ else {
                                         <li>Customer name: <?php echo($order['FIRST_NAME']); ?> <?php echo($order['LAST_NAME']); ?></li>
                                         <li>Status: <span class="<?php echo(($order['STATUS'] == 'Open') ? 'text-success' : 'text-warning'); ?>"><?php echo($order['STATUS']); ?></span></li>
                                     </ul>
-                                    <a href="edit_order.php?order_id=<?php echo($order['ORDER_ID']); ?>" class="btn btn-primary pull-right">Edit <i class="fa fa-edit"></i></a>
+                                    <?php if ($order['STATUS'] == 'Open'): ?>
+                                        <a href="edit_order.php?order_id=<?php echo($order['ORDER_ID']); ?>" class="btn btn-primary pull-right">Edit <i class="fa fa-edit"></i></a>
+                                        <button class="btn btn-primary" id="invoke_invoice" onclick="generateInvoice(<?php echo("{$order['ORDER_ID']}, '{$order['ORDER_DATE']}', {$order['CUST_ID']}"); ?>);">Invoke invoice</button>
+                                    <?php endif; ?>
+                                    <?php if ($order['STATUS'] == 'Closed'): ?>
+                                        <a href="invoice.php?order_id=<?php echo($order['ORDER_ID']); ?>" class="btn btn-primary pull-right">Watch invoice <i class="fa fa-list-alt"></i></a>
+                                    <?php endif; ?>
                                     <div class="clearfix"></div>
                                 </div>
                             </div>
@@ -82,5 +88,6 @@ else {
 
 <?php include_once('parts/bottom.php'); ?>
 
+<script src="assets/js/orders_list.js"></script>
 
 </html>

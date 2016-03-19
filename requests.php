@@ -5,6 +5,7 @@
 @require_once('classes/Request.php');
 @require_once('database/Customer.php');
 @require_once('database/Order.php');
+@require_once('database/Invoice.php');
 @require_once('classes/Utils.php');
 
 $req = new Request();
@@ -91,4 +92,27 @@ function action_save_order(Request $req) {
     }
 
     return $response;
+}
+
+function action_generate_invoice(Request $request) {
+    $db = new Database();
+
+    $order_id = $request->get_int_param('order_id', -1);
+    $order_date = $request->get_stripped_param('order_date', "");
+    $order_date = date('Y-m-d', strtotime($order_date));
+    $cust_id = $request->get_int_param('cust_id', -1);
+
+    Invoice::insertInvoiceHeader($order_id, $order_date, $cust_id);
+
+    $invoice_id = Invoice::getLastAdded($db)[0]['LAST'];
+    $results = Order::getOrderRows($order_id, $db);
+
+    foreach ($results as $index=>$result) {
+        Invoice::insertRow($index + 1, $invoice_id, $result['P_ID'], $result['QUANTITY'], $db);
+    }
+
+    return array(
+        "status" => true,
+        "invoice_id" => $invoice_id,
+    );
 }

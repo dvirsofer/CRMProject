@@ -42,12 +42,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <form method="post" action="warehouse_inventory.php">
                         <div class="row">
-                            <div class="form-group">
+                            <div class="form-group col-md-12">
                                 <label for="warehouse_id">Select warehouse</label>
                                 <select class="form-control" id="warehouse_id" name="warehouse_id">
                                     <option value="0">select warehouse</option>
                                     <?php foreach($warehouses as $warehouse) { ?>
-                                        <option value="<?php echo($warehouse->WAREHOUSE_ID) ?>"><?php
+                                        <option value="<?php echo($warehouse->WAREHOUSE_ID) ?>"<?php echo($warehouse_id == $warehouse->WAREHOUSE_ID ? ' selected=selected' : '');?>><?php
                                             echo($warehouse->WAREHOUSE_NAME) ?></option>
                                     <?php } ?>
                                     </select>
