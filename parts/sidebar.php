@@ -45,6 +45,12 @@
                     <p>Orders</p>
                 </a>
             </li>
+            <li class="active">
+                <a href="balance_list.php">
+                    <i class="pe-7s-note"></i>
+                    <p>Balance</p>
+                </a>
+            </li>
         </ul>
     </div>
 </div>
