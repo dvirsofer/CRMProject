@@ -27,6 +27,17 @@ class Balance {
         }
         
     }
+
+	public static function getBalance($fromDate, $toDate) {
+		$db = new Database();
+		$q = "select * from table(get_balance_by_date(1,99999, to_date(:from_date, 'yyyy-mm-dd'), to_date(:to_date, 'yyyy-mm-dd')))";
+		$stid = $db->parseQuery($q);
+		oci_bind_by_name($stid, ':from_date', $fromDate);
+		oci_bind_by_name($stid, ':to_date', $toDate);
+		$result = $db->fetchAll($q, $stid);
+		return $result;
+
+	}
     
     /**
      * Add new Balance move
@@ -79,11 +90,11 @@ class Balance {
     	oci_execute($stid); // delete balance
     }
     
-    public static function getBalance($db) {
+    /*public static function getBalance($db) {
     	$q = "select * from balance order by move_date, move_id";
     	$result = $db->createQuery($q);
     	return $result;
-    }
+    }*/
     
     public static function getAllBalanceByDate($start, $end, $db) {
     	// Get the right date format to insert
