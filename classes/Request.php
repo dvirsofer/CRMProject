@@ -1,5 +1,7 @@
 <?php
 
+@include_once('classes/Utils.php');
+
 class Request {
 
 	private $_req = NULL;

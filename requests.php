@@ -76,13 +76,14 @@ function action_save_order(Request $req) {
             Order::insertHeader($db, $customer_id);
             $response['order_id'] = Order::getLastAdded($db)[0]['LAST'];
         } else {
-            // TODO: delete old products
+            // delete old products
+            Order::deleteOrderRows($response['order_id']);
         }
 
         $idx = 1;
         // insert products
         foreach ($products as $product) {
-            Order::insertRow($idx, $response['order_id'], $product['product_id'], $product['quantity'], $db);
+            Order::insertRow($idx, $response['order_id'], $product['P_ID'], $product['QUANTITY'], $db);
             $idx++;
         }
 
