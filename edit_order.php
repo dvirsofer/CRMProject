@@ -4,10 +4,18 @@
 
 @require_once('database/Customer.php');
 @require_once('database/Products.php');
+@require_once('database/Order.php');
+@include_once('classes/Request.php');
+
+$db = new Database();
+$request = new Request();
+
+$order_id = $request->get_int_param('order_id');
+$order_header = Order::getOrderHeader($order_id, $db)[0];
+$order_rows = Order::getOrderRows($order_id, $db);
 
 $customers = Customer::getCustomersList();
 $products = Products::getAllProducts();
-$order = Order::getOrderRows()
 
 ?>
 
@@ -50,7 +58,7 @@ $order = Order::getOrderRows()
                                                     <select class="form-control required" name="customer" id="customer">
                                                         <option value="">Choose an option</option>
                                                         <?php foreach ($customers as $customer): ?>
-                                                            <option value="<?php echo($customer->CUST_ID); ?>"><?php echo($customer->FIRST_NAME); ?></option>
+                                                            <option value="<?php echo($customer->CUST_ID); ?>"<?php echo($order_header['CUST_ID'] == $customer->CUST_ID ? ' selected="selected"' : ''); ?>><?php echo($customer->FIRST_NAME); ?></option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </div>
@@ -60,13 +68,13 @@ $order = Order::getOrderRows()
                                             <div class="col-md-5 col-md-offset-1">
                                                 <div class="form-group">
                                                     <label class="control-label">First Name</label>
-                                                    <input class="form-control" type="text" id="first_name" readonly>
+                                                    <input class="form-control" type="text" id="first_name" value="<?php echo($order_header['FIRST_NAME']); ?>" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-5">
                                                 <div class="form-group">
                                                     <label class="control-label">Last Name</label>
-                                                    <input class="form-control" type="text" id="last_name" readonly>
+                                                    <input class="form-control" type="text" id="last_name" value="<?php echo($order_header['LAST_NAME']); ?>" readonly>
                                                 </div>
                                             </div>
                                         </div>
@@ -130,7 +138,7 @@ $order = Order::getOrderRows()
                                 <button type="button" class="btn btn-default btn-fill btn-wd btn-back pull-left disabled" style="display: none;">Back</button>
 
                                 <button type="button" class="btn btn-info btn-fill btn-wd btn-next pull-right">Next</button>
-                                <button type="button" class="btn btn-info btn-fill btn-wd btn-finish pull-right" onclick="onFinishWizard()">Finish</button>
+                                <button type="button" class="btn btn-info btn-fill btn-wd btn-finish pull-right" onclick="onFinishUpdateWizard()">Finish</button>
                                 <button type="button" style="margin-right: 10px;" class="btn btn-danger btn-fill btn-wd btn-later pull-right" onclick="onCancelWizard()">Cancel</button>
 
                                 <div class="clearfix"></div>
@@ -150,13 +158,15 @@ $order = Order::getOrderRows()
 
 </body>
 
+<?php include_once('parts/bottom.php'); ?>
+
 <script>
     var customers = <?php echo(json_encode($customers)); ?>;
     var products = <?php echo(json_encode($products)); ?>;
+
+    var order_rows = <?php echo(json_encode($order_rows)); ?>;
+    var order_id = <?php echo($order_id); ?>;
 </script>
-
-
-<?php include_once('parts/bottom.php'); ?>
 
 <script src="assets/js/orders_wizard.js"></script>
 

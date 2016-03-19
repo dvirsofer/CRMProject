@@ -7,36 +7,6 @@ include_once 'database/Invoice.php';
 include_once 'database/Balance.php';
 
 class Order {
-
-//    /**
-//     * Insert new order
-//     */
-//    public static function insertNewOrder() {
-//    	$db = new Database();
-//
-//    	$headerResult = Order::insertHeader($db);
-//    	if($headerResult) { // Added new header
-//    		$order_id = Order::getLastAdded($db)[0]['LAST'];
-//    		$i = 1;
-//    		while(isset($_POST['desc'.$i])) { // Insert new rows to the new header
-//    			$price = explode(",",$_POST['desc'.$i])[1];
-//    			$_POST['desc'.$i] = explode(",",$_POST['desc'.$i])[0];
-//    			$p_id = Products::getProductId($_POST['desc'.$i]);
-//     			$rowResult = Order::insertRow($i, $order_id, $p_id, $_POST['quantity'.$i], $db);
-//     			if(strcmp($_POST['status'], 'Close') == 0) { // Add to Balance if Closed order
-//     				$order_date = Order::getOrderDate($order_id, $db)[0]['ORDER_DATE'];
-//     				Balance::insertBalanceWithAllParameters($order_date, $p_id, $_SESSION['id'], $_POST['quantity'.$i], $price,'Credit', $db);
-//     				Products::reduceQuantity($p_id, $_POST['quantity'.$i], $db);
-//     			}
-//    			$i++;
-//    		}
-//    		if(strcmp($_POST['status'], 'Close') == 0) { // Create Invoice if Close
-//    			Invoice::insertInvoice($order_id, $db);
-//    		}
-//    	} else { // Error in adding new header
-//    		return FALSE;
-//    	}
-//    }
     
     /**
      * Create new order header
@@ -50,23 +20,8 @@ class Order {
         $r = oci_execute($stid);  // executes and commits
         return $r;
     }
-    
-    /**
-     * Close the order
-     * Make status -> 'Close'
-     */
-    public static function closeOrder($order_id, $db) {
-    	$q = "begin update_status(:corder_id, 'Close'); end;";
-    	$stid = $db->parseQuery($q);
-    	oci_bind_by_name($stid, ':corder_id', $order_id);
-    	oci_execute($stid);  // executes and commits
-    }
-    
-    /**
-     * Create new  order row
-     * @param $index - the row num
-     */
-    public static function insertRow($index, $order_id, $p_id, $quantity, $db) {
+
+	public static function insertRow($index, $order_id, $p_id, $quantity, $db) {
     	$q = "begin insert_order_row(:corder_id, :crow_num, :cp_id, :cquantity); end;";
     	$stid = $db->parseQuery($q);
     	oci_bind_by_name($stid, ':corder_id', $order_id);
@@ -86,86 +41,30 @@ class Order {
     	return $result;
     }
     
-    /**
-     * Update an order 
-     */
-    public static function editOrder() {
-    	$db = new Database();
-    	// Update Header
-    	$q = "begin update_status(:corder_id, :cstatus); end;";
-    	$stid = $db->parseQuery($q);
-    	oci_bind_by_name($stid, ':corder_id', $_POST['order_id']);
-    	oci_bind_by_name($stid, ':cstatus', $_POST['status']);
-    	oci_execute($stid);  // executes and commits
-    	
-    	// Update Rows
-    	$i = 0;
-    	while(isset($_POST['quantity_'.$i])) {
-    		$q = "select max(row_num) as last from orders_rows r, products p where (r.p_id = p.p_id and r.order_id = '{$_POST['order_id']}')";
-    		$last_row = $db->createQuery($q)[0]['LAST'];
+	public static function getOrderHeader($order_id, $db) {
+		$q = "SELECT * FROM table(GET_ORDERS_HEADER('{$order_id}', 1, 99999))";
+		$result = $db->createQuery($q);
+		if (count($result) > 0) {
+			return $result;
+		} else {
+			return null;
+		}
+	}
 
-    		$q = "select * from orders_rows r, products p where (r.p_id = p.p_id and r.order_id = '{$_POST['order_id']}' and r.p_id='{$_POST['p_id_'.$i]}')";
-    		$product_row = $db->createQuery($q);
-    		
-    		if(count($product_row) > 0) { // Exist product
-    			$row_num = $product_row[0]['ROW_NUM'];
-    			if($_POST['quantity_'.$i] == 0) { // Delete row
-    				$q = "begin delete_order_row(:corder_id, :crow_num, :cquantity); end;";
-    				$stid = $db->parseQuery($q);
-    				oci_bind_by_name($stid, ':corder_id', $_POST['order_id']);
-    				oci_bind_by_name($stid, ':crow_num', $row_num);
-    				oci_execute($stid); // delete row
-    			} else { // Update quantity
-    				$q = "begin update_order_row_quantity(:corder_id, :crow_num, :cquantity); end;";
-    				$stid = $db->parseQuery($q);
-    				oci_bind_by_name($stid, ':cquantity', $_POST['quantity_'.$i]);
-    				oci_bind_by_name($stid, ':crow_num', $row_num);
-    				oci_bind_by_name($stid, ':corder_id', $_POST['order_id']);
-    				oci_execute($stid);  // executes and commits
-    			}
-    		} else { // Doesn't exist - create row
-    			$q = "begin insert_order_row(:corder_id, :crow_num, :cp_id, :cquantity); end;";
-    			$stid = $db->parseQuery($q);
-    			oci_bind_by_name($stid, ':corder_id', $_POST['order_id']);
-    			$new_row = $last_row + 1;
-    			oci_bind_by_name($stid, ':crow_num', $new_row);
-    			oci_bind_by_name($stid, ':cp_id', $_POST['p_id_'.$i]);
-    			oci_bind_by_name($stid, ':cquantity', $_POST['quantity_'.$i]);
-    			oci_execute($stid);  // executes and commits
-    		}
-    		$i++;
-    	}	
-    }
-
-    /**
-     * Find the order header details by its id
-     * @param int $order_id
-     * @return an array of the order header if found or FALSE otherwise
-     */
-    public static function getOrderHeader($order_id, $db) {
-    	$q = "select * from orders_header where order_id='{$order_id}'";
-    	$result = $db->createQuery($q);
-    	if (count($result) > 0) {
-    		return $result;
-    	} else {
-    		return FALSE;
-    	}
-    }
-    
-    /**
-     * Find the order rows by id
-     * @param int $order_id
-     * @return array of order rows if found or FALSE otherwise
-     */
-    public static function getOrderRows($order_id, $db) {
-    	$q = "select p.p_id, p.description, p.price, r.quantity from orders_rows r, products p where r.p_id = p.p_id and r.order_id = '{$order_id}'";
-    	$result = $db->createQuery($q);
-    	if (count($result) > 0) {
-    		return $result;
-    	} else {
-    		return FALSE;
-    	}
-    }
+	/**
+	 * Find the order rows by id
+	 * @param int $order_id
+	 * @return array of order rows if found or FALSE otherwise
+	 */
+	public static function getOrderRows($order_id, $db) {
+		$q = "select * from table(GET_ORDER_ROWS({$order_id},1,999))";
+		$result = $db->createQuery($q);
+		if (count($result) > 0) {
+			return $result;
+		} else {
+			return FALSE;
+		}
+	}
 
 
 	public static function getOrderHeaders($db) {
@@ -186,6 +85,26 @@ class Order {
 		} else {
 			return array();
 		}
+	}
+
+
+	/**
+	 * Cancel the order
+	 * Make status -> 'Close'
+	 */
+	public static function cancelOrder($order_id, $db) {
+		$q = "begin update_status(:corder_id, 'Cancel'); end;";
+		$stid = $db->parseQuery($q);
+		oci_bind_by_name($stid, ':corder_id', $order_id);
+		oci_execute($stid);  // executes and commits
+	}
+
+	public static function deleteOrderRows($order_id) {
+		$db = new Database();
+		$q = "begin delete_order_row(:corder_id); end;";
+		$stid = $db->parseQuery($q);
+		oci_bind_by_name($stid, ':corder_id', $order_id);
+		oci_execute($stid);  // executes and commits
 	}
 
 //    /**
@@ -260,5 +179,55 @@ class Order {
 //    	return $result[0]['COUNT'];
 //    }
 
+//    /**
+//     * Update an order
+//     */
+//    public static function editOrder() {
+//    	$db = new Database();
+//    	// Update Header
+//    	$q = "begin update_status(:corder_id, :cstatus); end;";
+//    	$stid = $db->parseQuery($q);
+//    	oci_bind_by_name($stid, ':corder_id', $_POST['order_id']);
+//    	oci_bind_by_name($stid, ':cstatus', $_POST['status']);
+//    	oci_execute($stid);  // executes and commits
+//
+//    	// Update Rows
+//    	$i = 0;
+//    	while(isset($_POST['quantity_'.$i])) {
+//    		$q = "select max(row_num) as last from orders_rows r, products p where (r.p_id = p.p_id and r.order_id = '{$_POST['order_id']}')";
+//    		$last_row = $db->createQuery($q)[0]['LAST'];
+//
+//    		$q = "select * from orders_rows r, products p where (r.p_id = p.p_id and r.order_id = '{$_POST['order_id']}' and r.p_id='{$_POST['p_id_'.$i]}')";
+//    		$product_row = $db->createQuery($q);
+//
+//    		if(count($product_row) > 0) { // Exist product
+//    			$row_num = $product_row[0]['ROW_NUM'];
+//    			if($_POST['quantity_'.$i] == 0) { // Delete row
+//    				$q = "begin delete_order_row(:corder_id, :crow_num, :cquantity); end;";
+//    				$stid = $db->parseQuery($q);
+//    				oci_bind_by_name($stid, ':corder_id', $_POST['order_id']);
+//    				oci_bind_by_name($stid, ':crow_num', $row_num);
+//    				oci_execute($stid); // delete row
+//    			} else { // Update quantity
+//    				$q = "begin update_order_row_quantity(:corder_id, :crow_num, :cquantity); end;";
+//    				$stid = $db->parseQuery($q);
+//    				oci_bind_by_name($stid, ':cquantity', $_POST['quantity_'.$i]);
+//    				oci_bind_by_name($stid, ':crow_num', $row_num);
+//    				oci_bind_by_name($stid, ':corder_id', $_POST['order_id']);
+//    				oci_execute($stid);  // executes and commits
+//    			}
+//    		} else { // Doesn't exist - create row
+//    			$q = "begin insert_order_row(:corder_id, :crow_num, :cp_id, :cquantity); end;";
+//    			$stid = $db->parseQuery($q);
+//    			oci_bind_by_name($stid, ':corder_id', $_POST['order_id']);
+//    			$new_row = $last_row + 1;
+//    			oci_bind_by_name($stid, ':crow_num', $new_row);
+//    			oci_bind_by_name($stid, ':cp_id', $_POST['p_id_'.$i]);
+//    			oci_bind_by_name($stid, ':cquantity', $_POST['quantity_'.$i]);
+//    			oci_execute($stid);  // executes and commits
+//    		}
+//    		$i++;
+//    	}
+//    }
 
 }

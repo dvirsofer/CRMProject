@@ -1,5 +1,5 @@
-addedProducts = {};
-selectedCustomer = {};
+window.addedProducts = {};
+window.selectedCustomer = {};
 
 (function() {
     $('.footable').footable();
@@ -11,6 +11,23 @@ selectedCustomer = {};
     initWizard();
 
 
+    var $currentObj = $('#customer');
+    var chosenCustomerId = $currentObj.val();
+
+    if (chosenCustomerId) {
+        customers.forEach(function(customer) {
+            if (chosenCustomerId == customer.CUST_ID) {
+                window.selectedCustomer = customer;
+            }
+        });
+    }
+
+    if (order_rows) {
+        order_rows.forEach(function(row) {
+            addRow(row.QUANTITY, row.P_ID);
+        });
+    }
+
 })();
 
 function chooseCustomerEvent(event) {
@@ -19,7 +36,7 @@ function chooseCustomerEvent(event) {
 
     customers.forEach(function(customer) {
         if (chosenCustomerId == customer.CUST_ID) {
-            selectedCustomer = customer;
+            window.selectedCustomer = customer;
             $('#first_name').val(customer.FIRST_NAME);
             $('#last_name').val(customer.LAST_NAME);
         }
@@ -28,27 +45,38 @@ function chooseCustomerEvent(event) {
 
 function addRowEvent(e) {
     e.preventDefault();
-
-    //get the footable object
-    var footable = $('.footable').data('footable');
     var product_id = $('#product_id').val();
     var quantity = $('#quantity').val();
+    addRow(quantity, product_id);
+}
+
+function addRow(quantity, product_id) {
+    //get the footable object
+    var footable = $('.footable').data('footable');
 
     products.forEach(function(product) {
         if (product_id == product.P_ID) {
-            if (product_id in addedProducts) {
+            if (product_id in window.addedProducts) {
                 return;
             }
             //build up the row we are wanting to add
             var newRow = '<tr><td>' + product_id + '</td><td>' + product.DESCRIPTION + '</td><td>' + product.WAREHOUSE_NAME + '</td><td>' + quantity + '</td><td><button class="remove-row btn btn-danger btn-xs"><i class="fa fa-remove"></i></button></td></tr>';
-            addedProducts['' + product_id] = {
-                'product_id': product_id,
-                'description': product.DESCRIPTION,
-                'warehouse': product.WAREHOUSE_ID,
-                'quantity': quantity
+
+            window.addedProducts['' + product_id] = {
+                'P_ID': product_id,
+                'DESCRIPTION': product.DESCRIPTION,
+                'WAREHOUSE_ID': product.WAREHOUSE_ID,
+                'WAREHOUSE_NAME': product.WAREHOUSE_NAME,
+                'QUANTITY': quantity
             };
-            //add it
-            footable.appendRow(newRow);
+
+            try {
+                //add it
+                footable.appendRow(newRow);
+            }
+            catch(err) {
+                return;
+            }
         }
     });
 }
@@ -62,7 +90,7 @@ function removeRowEvent(e) {
     //get the row we are wanting to delete
     var $row = $(this).parents('tr:first');
     var product_id = $row.find('td:first').text();
-    delete addedProducts[product_id];
+    delete window.addedProducts[product_id];
 
     //delete the row
     footable.removeRow($row);
@@ -73,13 +101,30 @@ function onFinishWizard() {
     $.post("requests.php",
         {
             "action": "save_order",
-            "customer": selectedCustomer,
-            "products": addedProducts
+            "customer": window.selectedCustomer,
+            "products": window.addedProducts
         },
         function(data, status){
             if (data["status"]) {
                 var order_id = data["order_id"];
                 swal("Good job!", "New order number " + order_id + " has been created!", "success");
+            }
+        });
+}
+
+function onFinishUpdateWizard() {
+
+    $.post("requests.php",
+        {
+            "order_id": order_id,
+            "action": "save_order",
+            "customer": window.selectedCustomer,
+            "products": window.addedProducts
+        },
+        function(data, status){
+            if (data["status"]) {
+                var order_id = data["order_id"];
+                swal("Good job!", "New order number " + order_id + " has been modified!", "success");
             }
         });
 }
