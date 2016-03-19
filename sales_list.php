@@ -5,7 +5,7 @@
 
 @session_start();
 
-$products = Products::getAllProducts();
+$sales = Balance::getSalesProducts();
 
 ?>
 
@@ -25,7 +25,7 @@ $products = Products::getAllProducts();
             <div class="container-fluid">
                 <div class="row">
                     <!-- Main content start here -->
-                    <h3>All Products</h3>
+                    <h3>All Sales Products</h3>
                     <table class="table table-hover table-striped">
                         <thead>
                         <th>Product ID</th>
@@ -34,12 +34,13 @@ $products = Products::getAllProducts();
                         <th>Quantity</th>
                         </thead>
                         <tbody>
-                        <?php foreach($products as $product): ?>
+
+                        <?php foreach($sales as $sale): ?>
                             <tr>
-                                <td><?php echo($product->P_ID); ?></td>
-                                <td><?php echo($product->DESCRIPTION); ?></td>
-                                <td><?php echo($product->WAREHOUSE_NAME); ?></td>
-                                <td><?php echo($product->QUANTITY); ?></td>
+                                <td><?php echo($sale['P_ID']); ?></td>
+                                <td><?php echo($sale['DESCRIPTION']); ?></td>
+                                <td><?php echo($sale['WAREHOUSE_NAME']); ?></td>
+                                <td><?php echo($sale['QUANTITY']); ?></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -59,3 +60,5 @@ $products = Products::getAllProducts();
 
 
 </html>
+
+

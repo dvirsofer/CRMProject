@@ -38,6 +38,14 @@ class Balance {
 		return $result;
 
 	}
+
+	public static function getSalesProducts() {
+		$db = new Database();
+		$q = "select * from table(get_sales_products(1,99999))";
+		$result = $db->createQuery($q);
+		return $result;
+
+	}
     
     /**
      * Add new Balance move

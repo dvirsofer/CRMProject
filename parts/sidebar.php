@@ -51,6 +51,12 @@
                     <p>Balance</p>
                 </a>
             </li>
+            <li class="active">
+                <a href="sales_list.php">
+                    <i class="pe-7s-note"></i>
+                    <p>Sales</p>
+                </a>
+            </li>
         </ul>
     </div>
 </div>
