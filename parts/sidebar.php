@@ -47,13 +47,13 @@
             </li>
             <li class="active">
                 <a href="balance_list.php">
-                    <i class="pe-7s-note"></i>
+                    <i class="pe-7s-graph2"></i>
                     <p>Balance</p>
                 </a>
             </li>
             <li class="active">
                 <a href="sales_list.php">
-                    <i class="pe-7s-note"></i>
+                    <i class="pe-7s-graph3"></i>
                     <p>Sales</p>
                 </a>
             </li>
