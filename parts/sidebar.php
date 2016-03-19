@@ -16,12 +16,6 @@
 
         <ul class="nav">
             <li class="active">
-                <a href="index.php">
-                    <i class="pe-7s-graph"></i>
-                    <p>Dashboard</p>
-                </a>
-            </li>
-            <li class="active">
                 <a href="customers_list.php">
                     <i class="pe-7s-add-user"></i>
                     <p>Customers</p>

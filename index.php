@@ -2,6 +2,9 @@
 
 @session_start();
 
+header("Location: orders_list.php");
+die();
+
 ?>
 
 <?php include_once('parts/head.php'); ?>

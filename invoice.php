@@ -1,6 +1,21 @@
 <?php
 
+
 @session_start();
+
+@require_once('classes/Request.php');
+@require_once('database/Order.php');
+@require_once('database/Invoice.php');
+
+$db = new Database();
+$request =  new Request();
+
+$order_id = $request->get_int_param('order_id');
+
+$invoice_header = Invoice::getInvoiceHeader($order_id, $db);
+$invoice_header = $invoice_header[0];
+$invoice_rows = Invoice::getInvoiceRows($invoice_header['INVOICE_ID'], $db);
+$total_quantity = 0;
 
 ?>
 
@@ -28,34 +43,34 @@
                     </div>
                     <div class="col-xs-6 text-right">
                         <h1>INVOICE</h1>
-                        <h1><small>Invoice #001</small></h1>
+                        <h1><small>Invoice #<?php echo($invoice_header['INVOICE_ID']); ?></small></h1>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-xs-5">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4>From: <a href="#">Your Name</a></h4>
+                        <div class="card">
+                            <div class="header">
+                                <h4>From: <a href="#">Automated CRM</a></h4>
                             </div>
-                            <div class="panel-body">
+                            <div class="content">
                                 <p>
-                                    Address <br>
-                                    details <br>
-                                    more <br>
+                                    <strong>Details</strong> <br>
+                                    This is an automated report generated with our system
+                                    <br>
                                 </p>
                             </div>
                         </div>
                     </div>
                     <div class="col-xs-5 col-xs-offset-2 text-right">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4>To : <a href="#">Client Name</a></h4>
+                        <div class="card">
+                            <div class="header">
+                                <h4>To : <a href="#"><?php echo(ucfirst($invoice_header['FIRST_NAME'])); ?></a></h4>
                             </div>
-                            <div class="panel-body">
+                            <div class="content">
                                 <p>
-                                    Address <br>
-                                    details <br>
-                                    more <br>
+                                    <strong>First Name:</strong> <?php echo(ucfirst($invoice_header['FIRST_NAME'])); ?> <br>
+                                    <strong>Last Name:</strong> <?php echo(ucfirst($invoice_header['LAST_NAME'])); ?> <br>
+                                    <strong>Customer:</strong> <?php echo($invoice_header['CUST_ID']); ?><br>
                                 </p>
                             </div>
                         </div>
@@ -66,98 +81,54 @@
                     <thead>
                     <tr>
                         <th>
-                            <h4>Service</h4>
+                            <h4>Product ID</h4>
                         </th>
                         <th>
                             <h4>Description</h4>
                         </th>
                         <th>
-                            <h4>Hrs/Qty</h4>
+                            <h4>Warehouse Name</h4>
                         </th>
                         <th>
-                            <h4>Rate/Price</h4>
-                        </th>
-                        <th>
-                            <h4>Sub Total</h4>
+                            <h4>Quantity</h4>
                         </th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td>Article</td>
-                        <td><a href="#">Title of your article here</a></td>
-                        <td class="text-right">-</td>
-                        <td class="text-right">$200.00</td>
-                        <td class="text-right">$200.00</td>
-                    </tr>
-                    <tr>
-                        <td>Template Design</td>
-                        <td><a href="#">Details of project here</a></td>
-                        <td class="text-right">10</td>
-                        <td class="text-right">75.00</td>
-                        <td class="text-right">$750.00</td>
-                    </tr>
-                    <tr>
-                        <td>Development</td>
-                        <td><a href="#">WordPress Blogging theme</a></td>
-                        <td class="text-right">5</td>
-                        <td class="text-right">50.00</td>
-                        <td class="text-right">$250.00</td>
-                    </tr>
+                    <?php foreach ($invoice_rows as $invoice_row): ?>
+                        <tr>
+                            <td><?php echo($invoice_row['P_ID']); ?></td>
+                            <td><?php echo($invoice_row['DESCRIPTION']); ?></td>
+                            <td><?php echo($invoice_row['WAREHOUSE_NAME']); ?></td>
+                            <td><?php echo($invoice_row['QUANTITY']); ?></td>
+                        </tr>
+                    <?php
+                        $total_quantity += $invoice_row['QUANTITY'];
+                        endforeach;
+                    ?>
                     </tbody>
                 </table>
                 <div class="row text-right">
                     <div class="col-xs-2 col-xs-offset-8">
                         <p>
                             <strong>
-                                Sub Total : <br>
-                                TAX : <br>
-                                Total : <br>
+                                Total Quantity: <br>
                             </strong>
                         </p>
                     </div>
                     <div class="col-xs-2">
                         <strong>
-                            $1200.00 <br>
-                            N/A <br>
-                            $1200.00 <br>
+                            <?php echo($total_quantity); ?><br>
                         </strong>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-xs-5">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h4>Bank details</h4>
-                            </div>
-                            <div class="panel-body">
-                                <p>Your Name</p>
-                                <p>Bank Name</p>
-                                <p>SWIFT : --------</p>
-                                <p>Account Number : --------</p>
-                                <p>IBAN : --------</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xs-7">
-                        <div class="span7">
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    <h4>Contact Details</h4>
-                                </div>
-                                <div class="panel-body">
-                                    <p>
-                                        Email : you@example.com <br><br>
-                                        Mobile : -------- <br> <br>
-                                        Twitter : <a href="https://twitter.com/tahirtaous">@TahirTaous</a>
-                                    </p>
-                                    <h4>Payment should be made by Bank Transfer</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button class="btn btn-danger btn-lg" onclick="cancelInvoice(<?php echo($invoice_header['INVOICE_ID']); ?>)">Cancel Invoice</button>
+                    </div>
+
+                </div>
             </div>
         </div>
 
@@ -170,5 +141,19 @@
 
 <?php include_once('parts/bottom.php'); ?>
 
+<script>
+    function cancelInvoice(invoice_id) {
+        $.post("requests.php",
+            {
+                "action": "remove_invoice",
+                "invoice_id": invoice_id
+            },
+            function(data, status){
+                if (data["status"]) {
+                    location.href = "index.php";
+                }
+            });
+    }
+</script>
 
 </html>

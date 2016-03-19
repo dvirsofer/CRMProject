@@ -8,10 +8,6 @@ include_once 'database/Balance.php';
 
 class Invoice {
 
-	/**
-	 * Insert or Update inventory
-	 * @params: $p_id- the product id. $quantity- quantity of the product.
-	 */
 	public static function insertInvoiceHeader($order_id, $order_date, $cust_id) {
 		$db = new Database();
 		$q = "begin insert_invoice_header(:corder_id, to_date(:corder_date, 'yyyy-mm-dd'), :ccust_id); end;";
@@ -41,6 +37,34 @@ class Invoice {
 		oci_bind_by_name($stid, ':cquantity', $quantity);
 		$r = oci_execute($stid);  // executes and commits
 		return $r;
+	}
+
+	public static function getInvoiceHeader($order_id, $db) {
+		$q = "SELECT * FROM table(GET_INVOICE_HEADER('{$order_id}', 1, 99999))";
+		$result = $db->createQuery($q);
+		if (count($result) > 0) {
+			return $result;
+		} else {
+			return array();
+		}
+	}
+
+	public static function getInvoiceRows($invoice_id, $db) {
+		$q = "select * from table(GET_INVOICE_ROWS({$invoice_id},1,999))";
+		$result = $db->createQuery($q);
+		if (count($result) > 0) {
+			return $result;
+		} else {
+			return array();
+		}
+	}
+
+	public static function deleteInvoice($invoice_id) {
+		$db = new Database();
+		$q = "begin delete_invoice(:cinvoice_id); end;";
+		$stid = $db->parseQuery($q);
+		oci_bind_by_name($stid, ':cinvoice_id', $invoice_id);
+		oci_execute($stid);  // executes and commits
 	}
 
 //	/**

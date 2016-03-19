@@ -116,3 +116,13 @@ function action_generate_invoice(Request $request) {
         "invoice_id" => $invoice_id,
     );
 }
+
+function action_remove_invoice(Request $req) {
+    $invoice_id = $req->get_int_param('invoice_id', -1);
+    Invoice::deleteInvoice($invoice_id);
+
+    return array(
+        "status" => true,
+        "invoice_id" => $invoice_id,
+    );
+}
