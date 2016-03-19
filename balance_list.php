@@ -1,8 +1,18 @@
 <?php
 
 @require_once('help_functions.php');
+include_once 'database/Balance.php';
 
 @session_start();
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $fromDate = $_POST['from_date'];
+    $toDate = date('Y-m-d', strtotime($_POST['to_date'] . '+1 days'));
+
+    $balances = Balance::getBalance($fromDate, $toDate);
+
+}
 
 ?>
 
@@ -35,6 +45,36 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
+
+                    <?php if ($_SERVER["REQUEST_METHOD"] == "POST") {?>
+
+                        <h3>All Balance</h3>
+                        <table class="table table-hover table-striped">
+                            <thead>
+                            <th>Move Id</th>
+                            <th>Move Date</th>
+                            <th>Product Id</th>
+                            <th>Product Description</th>
+                            <th>Warehouse Name</th>
+                            <th>Essence</th>
+                            <th>Quantity</th>
+                            </thead>
+                            <tbody>
+                            <?php foreach($balances as $balance): ?>
+                                <tr>
+                                    <td><?php echo($balance->MOVE_ID); ?></td>
+                                    <td><?php echo($balance->MOVE_DATE); ?></td>
+                                    <td><?php echo($balance->P_ID); ?></td>
+                                    <td><?php echo($balance->DESCRIPTION); ?></td>
+                                    <td><?php echo($balance->WAREHOUSE_NAME); ?></td>
+                                    <td><?php echo($balance->ESSENCE); ?></td>
+                                    <td><?php echo($balance->QUANTITY); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+
+                    <?php } ?>
 
                 </div>
             </div>
