@@ -36,11 +36,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="from_date">From Date</label>
-                                <input type="date" class="form-control" id="from_date" name="from_date" placeholder="Date">
+                                <input type="date" class="form-control" id="from_date" name="from_date" placeholder="Date" value="<?php
+                                    if(!empty($fromDate)) { echo $fromDate; } ?>">
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="to_date">To Date</label>
-                                <input type="date" class="form-control" id="to_date" name="to_date" placeholder="Date">
+                                <input type="date" class="form-control" id="to_date" name="to_date" placeholder="Date" value="<?php
+                                    if(!empty($toDate)) { echo $_POST['to_date']; } ?>">
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
