@@ -174,7 +174,17 @@ class Order {
 		if (count($result) > 0) {
 			return $result;
 		} else {
-			return null;
+			return array();
+		}
+	}
+
+	public static function getOrderHeadersFilterDate($db, $fromDate, $toDate) {
+		$q = "SELECT * FROM table(GET_ORDERS_HEADERS_FILTER_DATE(1, 99999, to_date('{$fromDate}', 'yyyy-mm-dd'), to_date('{$toDate}', 'yyyy-mm-dd')))";
+		$result = $db->createQuery($q);
+		if (count($result) > 0) {
+			return $result;
+		} else {
+			return array();
 		}
 	}
 

@@ -6,7 +6,17 @@
 @include_once('database/Order.php');
 
 $db = new Database();
-$orders = Order::getOrderHeaders($db);
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $fromDate = $_POST['from_date'];
+    $toDate = date('Y-m-d', strtotime($_POST['to_date'] . '+1 days'));
+    $orders = Order::getOrderHeadersFilterDate($db, $fromDate, $toDate);
+
+}
+else {
+    $orders = Order::getOrderHeaders($db);
+}
 
 ?>
 
@@ -26,6 +36,21 @@ $orders = Order::getOrderHeaders($db);
             <div class="container-fluid">
                 <div class="row">
                 <!-- Main content start here -->
+                    <form method="post" action="orders_list.php">
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                <label for="from_date">From Date</label>
+                                <input type="date" class="form-control" id="from_date" name="from_date" placeholder="Date">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="to_date">To Date</label>
+                                <input type="date" class="form-control" id="to_date" name="to_date" placeholder="Date">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+
+                    <hr>
                     <?php foreach ($orders as $order): ?>
                         <div class="col-sm-4">
                             <div class="card">
