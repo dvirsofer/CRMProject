@@ -8,8 +8,6 @@
 $db = new Database();
 $orders = Order::getOrderHeaders($db);
 
-debug($orders);
-
 ?>
 
 <?php include_once('parts/head.php'); ?>
